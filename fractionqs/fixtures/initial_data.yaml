@@ -1,0 +1,16 @@
+- model: fractionqs.oper
+  pk: 1
+  fields:
+    oper_name: '+'
+- model: fractionqs.oper
+  pk: 2
+  fields:
+    oper_name: '-'
+- model: fractionqs.oper
+  pk: 3
+  fields:
+    oper_name: '*'
+- model: fractionqs.oper
+  pk: 4
+  fields:
+    oper_name: '/'    

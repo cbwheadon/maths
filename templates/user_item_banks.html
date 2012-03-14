@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+Welcome!
+<BR>
+
+<h3>Item Banks</h3>
+
+<table>
+<th>Domain</th>
+<th>Name</th>
+<th>Topic</th>
+<th>Questions Answered</th>
+<th>Time Spent</th>
+<th>Ability</th>
+
+{% for bank in user_banks %}
+
+<tr>
+  <td>{{bank.item_bank.domain}}</td>
+  <td>{{bank.item_bank.name}}</td>
+  <td>{{bank.item_bank.topic}}</td>
+  <td>{{bank.questions}}</td>
+  <td>{{bank.time_taken}}</td>
+  <td>{{bank.ability}}</td>
+</tr>
+
+{% endfor%}
+</table>
+
+{% endblock %}

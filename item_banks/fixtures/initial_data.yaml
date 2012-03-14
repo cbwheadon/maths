@@ -1,0 +1,4 @@
+- model: item_banks.domain
+  pk: 1
+  fields:
+    name: 'Number'
