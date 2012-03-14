@@ -14,6 +14,9 @@ Welcome!
 <th>Questions Answered</th>
 <th>Time Spent</th>
 <th>Ability</th>
+{% for cat_test in cat_tests %}  
+  <td>Test</td>
+{% endfor %}
 
 {% for bank in user_banks %}
 
@@ -24,9 +27,14 @@ Welcome!
   <td>{{bank.questions}}</td>
   <td>{{bank.time_taken}}</td>
   <td>{{bank.ability}}</td>
+  
+{% for cat_test in cat_tests %}  
+  <td><A href="/start/?item_bank_id={{bank.item_bank.id}}&cat_test_id={{cat_test.id}}">{{cat_test.name}}</A></td>
+{% endfor %}
+  
 </tr>
 
-{% endfor%}
+{% endfor %}
 </table>
 
 {% endblock %}

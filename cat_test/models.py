@@ -91,7 +91,7 @@ class UserCatTest(models.Model):
 #20. Go to step 1.
       self.save()      
       return(self)
-    
+	  
 class CatTestItem(models.Model):      
     user_cat_test = models.ForeignKey(UserCatTest)
     item_bank_question = models.ForeignKey(ItemBankQuestion)

@@ -16,7 +16,7 @@ class TestCatTest(TestCase):
       cat_test.max_items = 10
       cat_test.max_se = 2
       cat_test.save()
-      ct = CatTest.objects.all()[0]
+      ct = CatTest.objects.get(name="short")
       self.assertEquals(ct.name,"short")
       self.assertEquals(ct.min_items,5)
       self.assertEquals(ct.max_items,10)
@@ -233,8 +233,6 @@ class TestUserCatTest(TestCase):
       self.assertEquals(user_cat_test.difficulty, - 2.0/3.0)
       self.assertEquals(user_cat_test.hardness,0)      
       self.assertEquals(user_cat_test.ability,math.log(2))
-
-      
       
 class TestCatTestItem(TestCase):
     def test_create_and_save(self):

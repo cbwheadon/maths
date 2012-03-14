@@ -13,6 +13,7 @@ class ItemBank(models.Model):
   name = models.CharField(max_length=200)
   domain = models.ForeignKey(Domain)  
   topic = models.CharField(max_length=200)
+  template = models.CharField(max_length=20, default="default.html")
   create_date = models.DateField(default=datetime.date.today)
  
   def __unicode__(self):

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{{user_cat_test.item_bank.name}}<BR>
+{{user_cat_test.item_bank.domain.name}}<BR>
+
+Questions completed: {{user_cat_test.items}}
+
+{% include user_cat_test.item_bank.template %}
+	
+{% endblock %}

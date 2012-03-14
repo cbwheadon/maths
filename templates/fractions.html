@@ -1,0 +1,42 @@
+<style>
+    td.upper_line { border-top:solid 1px black; }
+    table.fraction { text-align: right; vertical-align: middle;
+        margin-top:0.5em; margin-bottom:0.5em; line-height: 2em; }
+</style>
+
+Fraction Question<BR>
+
+Work out:
+<BR>
+{{question.f1|safe|escape }} {{question.oper}} {{ question.f2|safe|escape }}
+<BR>
+
+<form id="fForm" action="" method="post">{% csrf_token %}
+	<table class="fraction" cellpadding="0" align="center">
+		<tr>
+			<td rowspan="2" nowrap="nowrap">
+				{{ form.const }}
+			</td>
+			<td nowrap="nowrap">
+				{{ form.num }}
+			</td>
+		</tr>
+		<tr>
+			<td class="upper_line">
+				{{ form.denom }}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type="hidden" id="timer_fm" name="time"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><input type="submit" id="fm_button" value="Send answer" />
+			</td>
+		</tr>
+	</table>
+</form>
+
+<BR>Make sure you write the fraction in its simplest form. 
+
