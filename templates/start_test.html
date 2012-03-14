@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+Start Test
+
+You are about to take a test.<BR>
+
+Domain: {{item_bank.domain.name}}<BR>
+Topic: {{item_bank.name}}<BR>
+Area: {{item_bank.topic}}<BR>
+
+The test is a {{cat_test.name}}<BR>
+with a minimum of {{cat_test.min_items}} questions<BR>
+and a maximum of {{cat_test.max_items}} questions<BR>
+
+Take as long as you like, there is no time limit.
+
+{% endblock %}
