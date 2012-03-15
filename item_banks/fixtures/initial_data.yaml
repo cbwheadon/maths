@@ -2,3 +2,9 @@
   pk: 1
   fields:
     name: 'Number'
+
+- model: item_banks.questiontype
+  pk: 1
+  fields:
+    name: 'fraction'
+    

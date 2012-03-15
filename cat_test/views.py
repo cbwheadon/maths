@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from cat_test.models import CatTest, UserCatTest
 from item_banks.models import ItemBank, ItemBankFractionQuestion
-from fractionqs.forms import FractionForm
+from fractionqs.models import FractionWithConstantForm
 
 def start_test(request):
   #check for log in
@@ -31,22 +31,30 @@ def question(request):
   #check for log in
   if not request.user.is_authenticated():
     return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
-  if request.method == 'GET':     
-    user = request.user
-    user_cat_test = UserCatTest.objects.get(user=user)
-    #get next question
-    cat_test_item = user_cat_test.nextQuestion()
-    ibq = cat_test_item.item_bank_question
-    #check item type
-    if user_cat_test.item_bank.name == "Fractions":
-      ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
-      q = ifq.fraction_bank_question.question
-      form = FractionForm()
+  user = request.user
+  user_cat_test = UserCatTest.objects.get(user=user)
+  #get next question
+  cat_test_item = user_cat_test.nextQuestion()
+  ibq = cat_test_item.item_bank_question
+  #check item type
+  if user_cat_test.item_bank.question_type.name == "fraction":
+    ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
+    q = ifq.fraction_bank_question.question
+    form = FractionWithConstantForm()
+  if request.method == 'GET':      
     return render_to_response('question.html',{"user_cat_test":user_cat_test,"question":q,'form': form})
   else:
     #process then redirect to feedback
+    if user_cat_test.item_bank.question_type.name == "fraction":
+      f = FractionWithConstantForm(request.POST)
+    response = f.save(commit=False)
+    if response == q.answer:
+      correct = 1
+    else:
+      correct = 0      
+    user_cat_test.updateAbility(correct)      
     return HttpResponseRedirect('/feedback/')
-	
+    
 def feedback(request):
   #check for log in
   if not request.user.is_authenticated():

@@ -1,11 +1,19 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion, QuestionType
 from fractionqs.models import FractionQuestionBank, Oper, FractionBankQuestion
 import datetime
 from django.contrib.auth.models import User
 from django.test.client import Client
 from functional_tests import ROOT
+
+class TestQuestionType(TestCase):
+    def test_create_and_save_question_type(self):
+      qtype = QuestionType()
+      qtype.name = "fraction"
+      qtype.save()
+      qt = QuestionType.objects.all()[0]
+      self.assertEquals(qt.name,"fraction")
 
 class TestItemBank(TestCase):
     def test_create_and_save_item_bank(self):
@@ -14,7 +22,7 @@ class TestItemBank(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       n = len(ItemBank.objects.all())
       self.assertEquals(n,1)
@@ -29,7 +37,7 @@ class TestItemBankQuestion(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       ibq = ItemBankQuestion()
       ibq.item_bank = item_bank
@@ -54,7 +62,7 @@ class TestItemBankFractionQuestion(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       #Create item bank question
       ibq = ItemBankQuestion()
@@ -91,7 +99,7 @@ class TestItemBankFractionQuestion(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       #Create fraction question bank
       fqb = FractionQuestionBank()

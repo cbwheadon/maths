@@ -1,5 +1,5 @@
 from django.test import TestCase
-from maths.fractionqs.models import FractionWithConstant, FractionQuestion, Oper, FractionBank, FractionBankFraction, FractionBankQuestion, FractionQuestionBank
+from maths.fractionqs.models import FractionWithConstant, FractionQuestion, Oper, FractionBank, FractionBankFraction, FractionBankQuestion, FractionQuestionBank, FractionWithConstantForm
 import datetime
 
 def createFraction(i,oper):
@@ -111,7 +111,7 @@ class TestCreateFraction(TestCase):
           ans = fq1.oper(fq2,my_oper)
           self.assertEquals(ans.const, my_ans.const)
           self.assertEquals(ans.num, my_ans.num)
-          self.assertEquals(ans.denom, my_ans.denom)
+          self.assertEquals(ans.denom, my_ans.denom)            
         
 class TestFractionsQuestion(TestCase):
     def test_creation(self):
@@ -335,7 +335,7 @@ class TestFractionQuestionBank(TestCase):
       fqb.generate(name,st,en,negatives_allowed,oper,n)
       fbq = FractionBankQuestion.objects.all()      
       self.assertEquals(len(fbq),n)  
-      
+                 
       #def test_fill(self): 
       #  oper1 = Oper(oper_name="+")      
       #  oper1.save()
@@ -361,4 +361,8 @@ class TestFractionQuestionBank(TestCase):
       #  self.assertEquals(tfqbs.fraction_bank.name,"Bank 1")
       #  opers = [oper1]
       #  fqb.fill(opers)
-        
+class TestFractionForm(TestCase):
+    def test_create_and_save(self):
+      data = {'const': 1, 'num': 2, 'denom': 3}
+      f = FractionWithConstantForm(data)
+      self.assertEquals(f.is_valid(),True)           

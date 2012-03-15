@@ -3,7 +3,7 @@ from django.test.client import Client
 from functional_tests import ROOT
 from cat_test.models import CatTest, CatTestItem, UserCatTest
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank, Domain, ItemBankQuestion
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType
 from centres.models import UserItemBank
 import datetime, math
 
@@ -37,7 +37,7 @@ class TestUserCatTest(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -68,7 +68,7 @@ class TestUserCatTest(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -120,7 +120,7 @@ class TestUserCatTest(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -182,7 +182,7 @@ class TestUserCatTest(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -249,7 +249,7 @@ class TestCatTestItem(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
-      item_bank.create_date = datetime.datetime(2012,03,06)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user

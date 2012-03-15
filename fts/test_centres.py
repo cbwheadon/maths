@@ -120,6 +120,7 @@ class TestAdmin(FunctionalTest):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -130,6 +131,7 @@ class TestAdmin(FunctionalTest):
       item_bank.name = "Fractions"
       item_bank.topic = "Subtraction"
       item_bank.domain = domain
+      item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user

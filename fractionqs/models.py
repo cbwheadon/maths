@@ -1,5 +1,6 @@
 from django.db import models
 from fractions import Fraction
+from django.forms import ModelForm, TextInput
 import random, datetime
 
 class FractionWithConstant(models.Model):
@@ -7,11 +8,11 @@ class FractionWithConstant(models.Model):
     num = models.IntegerField()
     denom = models.IntegerField()
     
-    def __init__(self, *args, **kwargs):
-        self.const = kwargs.get('const')
-        self.num = kwargs.get('num')
-        self.denom = kwargs.get('denom')
-        super(FractionWithConstant, self).__init__(*args, **kwargs)    
+    #def __init__(self, *args, **kwargs):
+    #    self.const = kwargs.get('const')
+    #    self.num = kwargs.get('num')
+    #    self.denom = kwargs.get('denom')
+    #    super(FractionWithConstant, self).__init__(*args, **kwargs)    
 
     def __eq__(self, other):
         if self.denom != 0 and other.denom !=0:
@@ -81,6 +82,17 @@ class FractionWithConstant(models.Model):
         ansq.denom = ans.denominator
         ansq = ansq.simplest_form()
         return(ansq)
+
+# Create the form class.
+class FractionWithConstantForm(ModelForm):
+  class Meta:
+    model = FractionWithConstant
+    fields = ('const', 'num' , 'denom')
+    widgets = {
+            'const': TextInput(attrs={'size': 3, 'maxlength': 3}),
+			'num': TextInput(attrs={'size': 3, 'maxlength': 3}),
+			'denom': TextInput(attrs={'size': 3, 'maxlength': 3}),
+        }   
         
 class Oper(models.Model):
     oper_name = models.CharField(max_length=1)

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from functional_tests import ROOT
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank, Domain, ItemBankQuestion
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType
 from centres.models import UserItemBank
 from cat_test.models import CatTest, UserCatTest
 from fractionqs.models import FractionQuestionBank, Oper
@@ -20,6 +20,7 @@ class TestCatTestViews(TestCase):
           item_bank.name = "Fractions"
           item_bank.topic = "Addition"
           item_bank.domain = domain
+          item_bank.question_type = QuestionType.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -47,6 +48,7 @@ class TestCatTestViews(TestCase):
           cat_test.save()
           domain = Domain.objects.get(pk=1)
           item_bank = ItemBank()
+          item_bank.question_type = QuestionType.objects.get(pk=1)
           item_bank.name = "Fractions"
           item_bank.topic = "Addition"
           item_bank.domain = domain
@@ -86,6 +88,7 @@ class TestCatQuestionView(TestCase):
           item_bank.topic = "Addition"
           item_bank.domain = domain
           item_bank.template = "fractions.html"
+          item_bank.question_type = QuestionType.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -119,19 +122,19 @@ class TestCatQuestionView(TestCase):
           #Increments question
           self.assertIn('Questions completed: 0',response.content)
           #Displays the correct sign for a fraction question
-          self.assertIn('+',response.content)          
+          self.assertIn('+',response.content)
+          #Test post triggers marking process
+          response = self.client.post('/question/', {'const': 0, 'num': 1, 'denom': 2})
+          user_cat_test = UserCatTest.objects.get(user=user)
+          self.assertEqual(user_cat_test.items,1)
+          self.assertEqual(user_cat_test.ability,0)
+          self.assertEqual(user_cat_test.difficulty,-2)
+          self.assertEqual(user_cat_test.hardness,0)
+          self.assertEqual(user_cat_test.right,0)
                 
         def test_question_view_wout_login(self):
           response = self.client.get('/question/')
           self.assertEqual(response.status_code, 302)
-          
-        def test_question_view_post(self):
-          user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
-          user.save()
-          self.client.login(username='john', password='johnpassword')
-          response = self.client.post('/question/',follow=True)
-          print response.redirect_chain 
-          self.assertEqual(response.status_code, 200)
 
 class TestCatFeedbackView(TestCase):
           def test_question_view_wout_login(self):
