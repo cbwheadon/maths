@@ -1,0 +1,6 @@
+##Needs easy_install
+##Pip install
+##unittest2
+##selenium
+##mock
+##PyYaml

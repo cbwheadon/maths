@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from item_banks.models import ItemBank, ItemBankQuestion
+from fractionqs.models import FractionWithConstant
 import random, math
 
 class CatTest(models.Model):
@@ -20,6 +21,8 @@ class UserCatTest(models.Model):
     hardness = models.FloatField(default=0)
     right = models.IntegerField(default=0)
     threshold = models.FloatField(default=0)
+    time_taken = models.IntegerField(default=0)
+    in_a_row = models.IntegerField(default=0)
     
     def __unicode__(self):
       return u'Ability: %s Difficulty %s Stand_Err %s Items %s Hardness %s Right %s' % (self.ability, self.difficulty,self.stand_err, self.items, self.hardness, self.right)        
@@ -52,6 +55,8 @@ class UserCatTest(models.Model):
           return(None)
       #Pick a random item
       q = random.choice(qrange)
+      q.usage +=1
+      q.save()
       #3. Set D at the actual calibration of that item.    
       self.difficulty = q.difficulty       
       self.save()    
@@ -59,7 +64,8 @@ class UserCatTest(models.Model):
       cti.save()      
       return(cti)
       
-    def updateAbility(self,correct):   
+    def updateAbility(self,correct,time_taken):
+      self.time_taken += int(time_taken)    
     #4. Administer that item.
     #5. Obtain a response.
     #6. Score that response.
@@ -69,10 +75,12 @@ class UserCatTest(models.Model):
       self.hardness += self.difficulty              
     #9. If response incorrect, update item difficulty: D = D - 2/L
       if correct == 0:
+        self.in_a_row = 0
         self.difficulty -= 2.0/self.items
     #10. If response correct, update item difficulty: D = D + 2/L
     #11. If response correct, count right answers: R = R + 1
       if correct==1:
+        self.in_a_row +=1
         self.right = self.right + 1      
         self.difficulty += 2.0/self.items
 #12. If not ready to decide to pass/fail, Go to step 2.
@@ -91,10 +99,14 @@ class UserCatTest(models.Model):
 #20. Go to step 1.
       self.save()      
       return(self)
-	  
+      
 class CatTestItem(models.Model):      
     user_cat_test = models.ForeignKey(UserCatTest)
     item_bank_question = models.ForeignKey(ItemBankQuestion)
     correct = models.IntegerField(default=0)
     skip = models.IntegerField(default=2)    
-    time = models.IntegerField(default=0)        
+    time_taken = models.IntegerField(default=0)
+    
+class CatTestItemFractionAnswer(models.Model):
+    cat_test_item = models.ForeignKey(CatTestItem)
+    fraction = models.ForeignKey(FractionWithConstant)    

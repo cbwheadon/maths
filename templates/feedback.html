@@ -4,4 +4,48 @@
 
 Feedback
 
+{% if cat_test_item.correct == 1 %}
+
+  Correct!<BR>
+
+{% else %}
+
+  Wrong!<BR>
+
+{% endif %}
+
+Time taken: {{cat_test_item.time_taken}}<BR>
+
+Your response was:
+
+{{response}}<BR>
+
+The answer was:
+
+{{answer}}
+
+<BR>
+
+{{user_cat_test.in_a_row}} in a row!
+
+{% if user_cat_test.ability != 0 %}
+
+Ability: {{ user_cat_test.ability }}
+
+{% else %}
+
+No ability estimate available yet...
+
+{% endif %}
+
+{% if end_test %}
+
+<A href="question">Next</A>
+
+{% else %}
+
+<A href="end">Next</A>
+
+{% endif %}
+
 {% endblock %}

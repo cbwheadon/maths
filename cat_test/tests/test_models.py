@@ -1,10 +1,11 @@
 from django.test import TestCase
 from django.test.client import Client
 from functional_tests import ROOT
-from cat_test.models import CatTest, CatTestItem, UserCatTest
+from cat_test.models import CatTest, CatTestItem, UserCatTest, CatTestItemFractionAnswer
 from django.contrib.auth.models import User
 from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType
 from centres.models import UserItemBank
+from fractionqs.models import FractionWithConstant
 import datetime, math
 
 class TestCatTest(TestCase):
@@ -47,11 +48,13 @@ class TestUserCatTest(TestCase):
       user_cat_test.user = user
       user_cat_test.item_bank = item_bank
       user_cat_test.cat_test = cat_test
+      user_cat_test.time_taken = 12      
       user_cat_test.save()
       uct = UserCatTest.objects.all()[0]
       self.assertEquals(uct.user,user)
       self.assertEquals(uct.item_bank,item_bank)
       self.assertEquals(uct.cat_test,cat_test)
+      self.assertEquals(uct.time_taken,12)
       
     def test_endTest(self):
       cat_test = CatTest()
@@ -211,7 +214,7 @@ class TestUserCatTest(TestCase):
         ibq.save()
       #Find first question
       user_cat_test.nextQuestion()
-      user_cat_test.updateAbility(1)
+      user_cat_test.updateAbility(1,0)
       self.assertEquals(user_cat_test.right,1)
       self.assertEquals(user_cat_test.items,1)
       self.assertEquals(user_cat_test.difficulty,2)
@@ -219,7 +222,7 @@ class TestUserCatTest(TestCase):
       self.assertEquals(user_cat_test.ability,0)
       #Second question right
       user_cat_test.nextQuestion()
-      user_cat_test.updateAbility(1)
+      user_cat_test.updateAbility(1,0)
       self.assertEquals(user_cat_test.right,2)
       self.assertEquals(user_cat_test.items,2)
       self.assertEquals(user_cat_test.difficulty,1)
@@ -227,12 +230,13 @@ class TestUserCatTest(TestCase):
       self.assertEquals(user_cat_test.ability,0)
       #Third question wrong
       user_cat_test.nextQuestion()
-      user_cat_test.updateAbility(0)
+      user_cat_test.updateAbility(0,12)
       self.assertEquals(user_cat_test.right,2)
       self.assertEquals(user_cat_test.items,3)
       self.assertEquals(user_cat_test.difficulty, - 2.0/3.0)
       self.assertEquals(user_cat_test.hardness,0)      
       self.assertEquals(user_cat_test.ability,math.log(2))
+      self.assertEquals(user_cat_test.time_taken,12)
       
 class TestCatTestItem(TestCase):
     def test_create_and_save(self):
@@ -266,8 +270,58 @@ class TestCatTestItem(TestCase):
       cat_test_item = CatTestItem()
       cat_test_item.user_cat_test = user_cat_test
       cat_test_item.item_bank_question = ibq
+      cat_test_item.time_taken = 12
+      ibq.usage +=1
+      ibq.save()      
       cat_test_item.save()
       cat_test_item = CatTestItem.objects.all()[0]
       self.assertEquals(cat_test_item.user_cat_test,user_cat_test)
       self.assertEquals(cat_test_item.item_bank_question,ibq)
+      self.assertEquals(cat_test_item.time_taken,12)
+      self.assertEquals(cat_test_item.item_bank_question.usage,1)
       
+class TestCatTestItemAnswer(TestCase):
+    def test_create_and_save(self):
+      cat_test = CatTest()
+      cat_test.name = "short"
+      cat_test.save()
+      user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+      user.save()
+      domain = Domain()
+      domain.name = "Number"
+      domain.create_date = datetime.datetime(2012,03,06)
+      domain.save()
+      item_bank = ItemBank()
+      item_bank.name = "Fractions"
+      item_bank.topic = "Addition"
+      item_bank.domain = domain
+      item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.save()
+      user_item_bank = UserItemBank()
+      user_item_bank.user = user
+      user_item_bank.item_bank = item_bank
+      user_item_bank.save()
+      ibq = ItemBankQuestion()
+      ibq.item_bank = item_bank
+      ibq.save()
+      user_cat_test = UserCatTest()
+      user_cat_test.user = user
+      user_cat_test.item_bank = item_bank
+      user_cat_test.cat_test = cat_test
+      user_cat_test.save()
+      cat_test_item = CatTestItem()
+      cat_test_item.user_cat_test = user_cat_test
+      cat_test_item.item_bank_question = ibq
+      cat_test_item.time_taken = 12
+      cat_test_item.save()
+      answer = FractionWithConstant()
+      answer.const = 1
+      answer.denom = 2
+      answer.num = 3
+      answer.save()
+      ctifa = CatTestItemFractionAnswer()
+      ctifa.cat_test_item = cat_test_item
+      ctifa.fraction = answer
+      ctifa.save()
+      ctifa = CatTestItemFractionAnswer.objects.filter(cat_test_item = cat_test_item)[0]
+      self.assertEquals(ctifa.fraction,answer)

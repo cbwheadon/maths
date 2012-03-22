@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib.auth.views import login, logout
 from maths.centres.views import welcome
-from maths.cat_test.views import start_test, question, feedback
+from maths.cat_test.views import start_test, question, feedback, end_test
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -24,4 +24,5 @@ urlpatterns = patterns('',
     (r'^start/$', start_test),
     (r'^question/$', question),    
     (r'^feedback/$', feedback),
+    (r'^end/$', end_test),
 )

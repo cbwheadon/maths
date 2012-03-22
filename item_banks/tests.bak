@@ -17,7 +17,10 @@ class TestQuestionType(TestCase):
 
 class TestItemBank(TestCase):
     def test_create_and_save_item_bank(self):
-      domain = Domain.objects.get(name="Number")
+      #domain = Domain.objects.get(name="Number")
+      domain = Domain()
+      domain.name = "Number"
+      domain.save()
       item_bank = ItemBank()
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
