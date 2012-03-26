@@ -3,7 +3,7 @@ from django.test.client import Client
 from functional_tests import ROOT
 from cat_test.models import CatTest, CatTestItem, UserCatTest, CatTestItemFractionAnswer
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType, ItemBankTemplate
 from centres.models import UserItemBank
 from fractionqs.models import FractionWithConstant
 import datetime, math
@@ -39,6 +39,7 @@ class TestUserCatTest(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -72,6 +73,7 @@ class TestUserCatTest(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -124,6 +126,7 @@ class TestUserCatTest(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -186,6 +189,7 @@ class TestUserCatTest(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -254,6 +258,7 @@ class TestCatTestItem(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
@@ -296,6 +301,7 @@ class TestCatTestItemAnswer(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user

@@ -18,11 +18,13 @@ Time taken: {{cat_test_item.time_taken}}<BR>
 
 Your response was:
 
-{{response}}<BR>
+{{response|safe|escape}}
+
+<BR>
 
 The answer was:
 
-{{answer}}
+{{answer|safe|escape}}
 
 <BR>
 
@@ -38,14 +40,12 @@ No ability estimate available yet...
 
 {% endif %}
 
-{% if end_test %}
-
-<A href="question">Next</A>
-
-{% else %}
-
-<A href="end">Next</A>
-
+{% if end_test == 1 %}
+  <A href="/end/">End</A>
+{% else %}  
+  <A href="/question/">Next</A>
 {% endif %}
+
+{{end_test}}
 
 {% endblock %}

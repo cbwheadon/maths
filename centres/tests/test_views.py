@@ -1,6 +1,6 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate, UserItemBank
-from item_banks.models import ItemBank, Domain, QuestionType
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
 from cat_test.models import CatTest
 import datetime
 from django.contrib.auth.models import User
@@ -26,6 +26,7 @@ class TestUserItemBanksView(TestCase):
           item_bank.topic = "Addition"
           item_bank.domain = domain
           item_bank.question_type = QuestionType.objects.get(pk=1)
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -37,6 +38,7 @@ class TestUserItemBanksView(TestCase):
           item_bank.topic = "Subtraction"
           item_bank.domain = domain
           item_bank.question_type = QuestionType.objects.get(pk=1)
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -66,6 +68,7 @@ class TestUserItemBanksView(TestCase):
           item_bank.topic = "Addition"
           item_bank.domain = domain
           item_bank.question_type = QuestionType.objects.get(pk=1)
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -112,6 +115,7 @@ class TestWelcomeLogin(TestCase):
         item_bank.topic = "Addition"
         item_bank.domain = domain
         item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
         item_bank.save()
         user_item_bank = UserItemBank()
         user_item_bank.user = user

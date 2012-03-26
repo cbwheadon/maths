@@ -19,17 +19,24 @@ class Candidate(models.Model):
     
   def __unicode__(self):
     return self.user.first_name + " " + self.user.last_name
-	
+    
 class UserItemBank(models.Model):
   user = models.ForeignKey(User)
   item_bank = models.ForeignKey(ItemBank)
-  tests = models.IntegerField(default=0)	
+  tests = models.IntegerField(default=0)    
   questions = models.IntegerField(default=0)
   correct = models.IntegerField(default=0)
-  accuracy = models.FloatField(default=0)
   time_taken = models.IntegerField(default=0)
-  accuracy_time = models.FloatField(default=0)
   ability = models.FloatField(default=0)
-  highest_ability = models.FloatField(default=0)
-  grade = models.IntegerField(default=0)	
-  highest_grade = models.IntegerField(default=0) 
+  ability_stand_err = models.FloatField(default=2)
+  grade = models.IntegerField(default=0)    
+  
+  def update(self,user_cat_test):
+    self.tests += 1
+    self.questions += user_cat_test.items
+    self.correct += user_cat_test.right
+    self.time_taken += user_cat_test.time_taken
+    self.ability = user_cat_test.ability
+    self.ability_stand_err = user_cat_test.stand_err
+    self.save()
+    return(self)  

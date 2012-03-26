@@ -1,8 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.template import RequestContext
 from django.shortcuts import render_to_response
 from cat_test.models import CatTest, UserCatTest, CatTestItem, CatTestItemFractionAnswer
 from item_banks.models import ItemBank, ItemBankFractionQuestion
 from fractionqs.models import FractionWithConstantForm, FractionWithConstant 
+from centres.models import UserItemBank
 
 def start_test(request):
   #check for log in
@@ -42,7 +44,7 @@ def question(request):
       ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
       q = ifq.fraction_bank_question.question
       form = FractionWithConstantForm()    
-    return render_to_response('question.html',{"user_cat_test":user_cat_test,"question":q,'form': form})
+    return render_to_response('question.html',{"user_cat_test":user_cat_test,"question":q,'form': form},context_instance=RequestContext(request))
   else:
     #process then redirect to feedback
     #get last item
@@ -54,21 +56,40 @@ def question(request):
       ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
       q = ifq.fraction_bank_question.question
       answer = FractionWithConstant()
-      answer.const = request.POST['const']
-      answer.denom = request.POST['num']
-      answer.num = request.POST['denom']
+      if 'const' in request.POST and request.POST['const']:         
+        try:
+          answer.const = int(request.POST['const'])
+        except:
+          answer.const = 0        
+      else:
+        answer.const = 0
+      if 'num' in request.POST and request.POST['num']:    
+        try:
+          answer.num = int(request.POST['num'])
+        except:
+          answer.num = 0        
+      else:
+        answer.num = 0
+      if 'denom' in request.POST and request.POST['denom']:     
+        try:
+          answer.denom = int(request.POST['denom'])
+        except:
+          answer.denom = 1               
+      else:
+        answer.denom = 1      
       answer.save()
       ctifa = CatTestItemFractionAnswer()
       ctifa.cat_test_item = cat_test_item
       ctifa.fraction = answer
       ctifa.save()
-    response = f.save(commit=False)
-        
-    if response == q.answer:
+    if answer == q.answer:
       correct = 1
     else:
       correct = 0
-    time_taken = request.POST['time']      
+    if 'time' in request.POST and request.POST['time']:       
+      time_taken = request.POST['time']
+    else:
+      time_taken = 0    
     user_cat_test.updateAbility(correct,time_taken)
     cat_test_item.time_taken = time_taken
     cat_test_item.correct = correct
@@ -90,11 +111,22 @@ def feedback(request):
     response = ctifa.fraction
     ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
     answer = ifq.fraction_bank_question.question.answer
-  end_test = user_cat_test.endTest()    
-  return render_to_response('feedback.html',{'cat_test_item':cat_test_item,'answer':answer,'response':response,'user_cat_test':user_cat_test,'end_test':end_test})
+  end_test = user_cat_test.endTest()
+  if end_test:
+    end_now = 1
+  else:
+    end_now = 0	
+  return render_to_response('feedback.html',{'cat_test_item':cat_test_item,'answer':answer,'response':response,'user_cat_test':user_cat_test,'end_test':end_now})
   
 def end_test(request):
   if not request.user.is_authenticated():
     return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
   user = request.user
-  return render_to_response('end_test.html')
+  user_cat_test = UserCatTest.objects.filter(user=user)
+  if len(user_cat_test)>0:
+    user_cat_test = user_cat_test.order_by('-id')[0]
+    uib = UserItemBank.objects.get(user=user,item_bank=user_cat_test.item_bank)
+    uib.update(user_cat_test)    
+    return render_to_response('end_test.html',{'user_cat_test':user_cat_test})
+  else:
+    return render_to_response('end_test.html',{'error':'No Test Found'})  

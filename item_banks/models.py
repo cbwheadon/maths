@@ -2,6 +2,9 @@ from django.db import models
 from fractionqs.models import FractionBankQuestion
 import datetime
 
+class ItemBankTemplate(models.Model):
+  name = models.CharField(max_length=20)
+
 class QuestionType(models.Model):
   name = models.CharField(max_length=20)
  
@@ -16,7 +19,7 @@ class ItemBank(models.Model):
   name = models.CharField(max_length=200)
   domain = models.ForeignKey(Domain)  
   topic = models.CharField(max_length=200)
-  template = models.CharField(max_length=20, default="default.html")
+  template = models.ForeignKey(ItemBankTemplate)
   question_type = models.ForeignKey(QuestionType)  
   create_date = models.DateField(default=datetime.date.today)
  

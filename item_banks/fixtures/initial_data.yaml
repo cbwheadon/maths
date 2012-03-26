@@ -8,3 +8,8 @@
   fields:
     name: 'fraction'
     
+- model: item_banks.itembanktemplate
+  pk: 1
+  fields:
+    name: 'fractions.html'    
+    

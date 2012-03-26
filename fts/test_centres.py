@@ -1,12 +1,35 @@
 from functional_tests import FunctionalTest, ROOT
 from selenium.webdriver.common.keys import Keys
-from item_banks.models import ItemBank, Domain
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
 from centres.models import UserItemBank
+from fractionqs.models import FractionQuestionBank, Oper
 from django.contrib.auth.models import User
 
 class TestAdmin(FunctionalTest):
 
-    def test_log_in_to_admin(self):
+    #def test_log_in_to_admin(self):
+      # Gertrude opens her web browser, and goes to the admin page
+      #self.browser.get(ROOT + '/admin/')
+
+      # She sees the familiar 'Django administration' heading
+      #body = self.browser.find_element_by_tag_name('body')
+      #self.assertIn('Django administration', body.text)
+      
+      # She types in her username and passwords and hits return
+      #username_field = self.browser.find_element_by_name('username')
+      #username_field.send_keys('admin')
+
+      #password_field = self.browser.find_element_by_name('password')
+      #password_field.send_keys('adm1n')
+      #password_field.send_keys(Keys.RETURN)
+      #print out what you see
+      #body = self.browser.find_element_by_tag_name('body')
+      #self.assertIn('Welcome', body.text)
+      #return(self)
+          
+    def test_can_create_new_centre_via_admin_site(self):
+      print("test_can_create_new_centre_via_admin_site")    
+      #Admin logs in
       # Gertrude opens her web browser, and goes to the admin page
       self.browser.get(ROOT + '/admin/')
 
@@ -24,12 +47,6 @@ class TestAdmin(FunctionalTest):
       #print out what you see
       body = self.browser.find_element_by_tag_name('body')
       self.assertIn('Welcome', body.text)
-      return(self)
-          
-    def test_can_create_new_centre_via_admin_site(self):
-      print("test_can_create_new_centre_via_admin_site")    
-      #Admin logs in
-      self.test_log_in_to_admin()
       #She sees a hyperlink that says "Centres"
       links = self.browser.find_elements_by_link_text('Centres')
       self.assertEquals(len(links), 2)
@@ -86,7 +103,6 @@ class TestAdmin(FunctionalTest):
       links[0].click()
       #Selects add link
       body = self.browser.find_element_by_tag_name('body')
-      print body.text
       
       add_link = self.browser.find_elements_by_link_text('Add candidate')
       add_link[0].click()
@@ -111,7 +127,6 @@ class TestAdmin(FunctionalTest):
       #Candidate is saved and name is displayed
       body = self.browser.find_element_by_tag_name('body')
       self.assertIn('The candidate "Johnny Rotten" was added successfully.', body.text)
-      print body.text
       
       #Set up two item banks and associate with user
       user = User.objects.get(username="JRotten") 
@@ -120,6 +135,7 @@ class TestAdmin(FunctionalTest):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
@@ -131,13 +147,27 @@ class TestAdmin(FunctionalTest):
       item_bank.name = "Fractions"
       item_bank.topic = "Subtraction"
       item_bank.domain = domain
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       user_item_bank = UserItemBank()
       user_item_bank.user = user
       user_item_bank.item_bank = item_bank
       user_item_bank.save()
-
+      
+      #Give the test some questions
+      #Create fraction question bank
+      fqb = FractionQuestionBank()
+      oper = Oper.objects.get(pk=1)
+      n = 20
+      st = 0
+      en = 10
+      name = "Test Bank"
+      negatives_allowed = True
+      fqb.generate(name,st,en,negatives_allowed,oper,n)
+      #Fill item bank from fraction question bank
+      item_bank.fill(fqb,"fractions")
+          
       #Candidate logs in and is directed to welcome page
       self.browser.get(ROOT + '/accounts/login/')
       name_field = self.browser.find_element_by_name('username')
@@ -155,3 +185,77 @@ class TestAdmin(FunctionalTest):
       self.assertIn('Number',  body.text)
       self.assertIn('Fractions',  body.text)
       self.assertIn('Addition',  body.text)
+      
+      #Candidate clicks on link to start test
+      links = self.browser.find_elements_by_link_text('Short Test')
+      links[0].click()
+      
+      #Should see start test screen
+      body = self.browser.find_element_by_tag_name('body')
+      self.assertIn('Fractions',body.text)
+      self.assertIn('Addition',body.text)
+      self.assertIn('Short Test',body.text)
+      self.assertIn('4', body.text)
+      
+      #Clicks on link to start test
+      links = self.browser.find_elements_by_link_text('Start the test')
+      links[0].click()
+      
+      body = self.browser.find_element_by_tag_name('body')
+      #Should be taken to first question
+      self.assertIn('Work out', body.text)
+      
+      #Enters answer and hits submit
+      const_field = self.browser.find_element_by_name('const')
+      const_field.send_keys('9')
+
+      num_field = self.browser.find_element_by_name('num')
+      num_field.send_keys('7')
+
+      denom_field = self.browser.find_element_by_name('denom')
+      denom_field.send_keys('8')
+
+      denom_field.send_keys(Keys.RETURN)
+      
+      #Should see feedback that answer is wrong
+      body = self.browser.find_element_by_tag_name('body')
+      self.assertIn('Wrong!', body.text)
+      self.assertIn('9', body.text)
+      self.assertIn('7', body.text)
+      self.assertIn('8', body.text)
+      
+      #Clicks next
+      links = self.browser.find_elements_by_link_text('Next')
+      links[0].click()
+      
+      #Question 2
+      denom_field = self.browser.find_element_by_name('denom')
+      denom_field.send_keys(Keys.RETURN)
+      
+      #Clicks next
+      links = self.browser.find_elements_by_link_text('Next')
+      links[0].click()
+      
+      #Question 3
+      denom_field = self.browser.find_element_by_name('denom')
+      denom_field.send_keys(Keys.RETURN)
+      
+      #Clicks next
+      links = self.browser.find_elements_by_link_text('Next')
+      links[0].click()
+      
+      #Question 4
+      denom_field = self.browser.find_element_by_name('denom')
+      denom_field.send_keys(Keys.RETURN)
+      
+      #Clicks next
+      links = self.browser.find_elements_by_link_text('End')
+      links[0].click()
+      
+      #Should see end
+      body = self.browser.find_element_by_tag_name('body')
+      self.assertIn('End', body.text)
+	  
+      #Clicks end
+      links = self.browser.find_elements_by_link_text('Return')
+      links[0].click()

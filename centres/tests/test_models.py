@@ -1,6 +1,7 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate, UserItemBank
-from item_banks.models import ItemBank, Domain, QuestionType
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
+from cat_test.models import CatTest, UserCatTest
 import datetime
 from django.contrib.auth.models import User
 from django.test.client import Client
@@ -72,12 +73,14 @@ class TestUserItemBank(TestCase):
         item_bank.topic = "Addition"
         item_bank.domain = domain
         item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
         item_bank.save()
         item_bank = ItemBank()
         item_bank.name = "Fractions"
         item_bank.topic = "Subtraction"
         item_bank.domain = domain
         item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
         item_bank.save()
         user_item_bank = UserItemBank()
         user_item_bank.user = user
@@ -87,4 +90,38 @@ class TestUserItemBank(TestCase):
         self.assertEqual(uibs.item_bank,item_bank)
         self.assertEqual(uibs.user,user)         
         item_banks = ItemBank.objects.filter(useritembank__user=user)
-        self.assertEqual(len(item_banks),1)         
+        self.assertEqual(len(item_banks),1)
+        
+    def test_user_item_bank_update(self):
+        user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+        user.save()
+        
+        #create structures
+        cat_test = CatTest()
+        cat_test.name = "Short Test"
+        cat_test.save()
+        domain = Domain.objects.get(pk=1)
+        item_bank = ItemBank()
+        item_bank.name = "Fractions"
+        item_bank.topic = "Addition"
+        item_bank.domain = domain
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
+        item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.save()
+        user_item_bank = UserItemBank()
+        user_item_bank.user = user
+        user_item_bank.item_bank = item_bank
+        user_item_bank.save()
+        user_cat_test = UserCatTest()
+        user_cat_test.user = user
+        user_cat_test.item_bank = item_bank
+        user_cat_test.cat_test = cat_test
+        user_cat_test.items = 6
+        user_cat_test.right = 4
+        user_cat_test.time_taken = 240
+        user_cat_test.save()
+        user_item_bank.update(user_cat_test)
+        self.assertEquals(user_item_bank.tests,1)
+        self.assertEquals(user_item_bank.questions,6)
+        self.assertEquals(user_item_bank.correct,4)
+        self.assertEquals(user_item_bank.time_taken,240)

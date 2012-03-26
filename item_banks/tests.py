@@ -1,11 +1,19 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion, QuestionType
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion, QuestionType, ItemBankTemplate
 from fractionqs.models import FractionQuestionBank, Oper, FractionBankQuestion
 import datetime
 from django.contrib.auth.models import User
 from django.test.client import Client
 from functional_tests import ROOT
+
+class TestItemBankTemplate(TestCase):
+    def test_create_and_save(self):
+      ibt = ItemBankTemplate()
+      ibt.name = "fractions.html"
+      ibt.save()
+      ibts = ItemBankTemplate.objects.all()[0]
+      self.assertEquals(ibts.name,"fractions.html")  
 
 class TestQuestionType(TestCase):
     def test_create_and_save_question_type(self):
@@ -22,6 +30,7 @@ class TestItemBank(TestCase):
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
       item_bank.domain = domain
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.question_type = QuestionType.objects.get(pk=1)
       item_bank.save()
       n = len(ItemBank.objects.all())
@@ -29,6 +38,7 @@ class TestItemBank(TestCase):
       ib = ItemBank.objects.all()[0]
       self.assertEquals(unicode(ib),"Fractions")
       self.assertEquals(ib.topic,"Addition")
+      self.assertEquals(ib.template.name,"fractions.html")
       
 class TestItemBankQuestion(TestCase):
     def test_can_create_and_save_item_bank_question(self):
@@ -39,6 +49,7 @@ class TestItemBankQuestion(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       ibq = ItemBankQuestion()
       ibq.item_bank = item_bank
@@ -65,6 +76,7 @@ class TestItemBankFractionQuestion(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       #Create item bank question
       ibq = ItemBankQuestion()
@@ -103,6 +115,7 @@ class TestItemBankFractionQuestion(TestCase):
       item_bank.topic = "Addition"
       item_bank.domain = domain
       item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       #Create fraction question bank
       fqb = FractionQuestionBank()

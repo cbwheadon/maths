@@ -1,7 +1,7 @@
 from django.test import TestCase
 from functional_tests import ROOT
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType, ItemBankFractionQuestion
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType, ItemBankFractionQuestion, ItemBankTemplate
 from centres.models import UserItemBank
 from cat_test.models import CatTest, UserCatTest, CatTestItem
 from fractionqs.models import FractionQuestionBank, Oper
@@ -22,6 +22,7 @@ class TestCatTestViews(TestCase):
           item_bank.topic = "Addition"
           item_bank.domain = domain
           item_bank.question_type = QuestionType.objects.get(pk=1)
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -54,6 +55,7 @@ class TestCatTestViews(TestCase):
           item_bank.name = "Fractions"
           item_bank.topic = "Addition"
           item_bank.domain = domain
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
           user_item_bank.user = user
@@ -92,7 +94,7 @@ class TestCatQuestionView(TestCase):
           item_bank.name = "Fractions"
           item_bank.topic = "Addition"
           item_bank.domain = domain
-          item_bank.template = "fractions.html"
+          item_bank.template = ItemBankTemplate.objects.get(pk=1)
           item_bank.question_type = QuestionType.objects.get(pk=1)
           item_bank.save()
           user_item_bank = UserItemBank()
@@ -226,7 +228,7 @@ class TestCatFeedbackView(TestCase):
             item_bank.name = "Fractions"
             item_bank.topic = "Addition"
             item_bank.domain = domain
-            item_bank.template = "fractions.html"
+            item_bank.template = ItemBankTemplate.objects.get(pk=1)
             item_bank.question_type = QuestionType.objects.get(pk=1)
             item_bank.save()
             user_item_bank = UserItemBank()
@@ -294,4 +296,37 @@ class TestCatEnd(TestCase):
             self.client.login(username='john', password='johnpassword')
             response = self.client.get('/end/')
             self.assertEqual(response.status_code, 200)    
-            self.assertTemplateUsed(response, 'end_test.html')          
+            self.assertTemplateUsed(response, 'end_test.html')
+
+          def test_display_user_cat_test(self):
+            #Test the post functionality of the question view         
+            user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+            user.save()
+            self.client.login(username='john', password='johnpassword')
+            
+            #create structures
+            cat_test = CatTest()
+            cat_test.name = "Short Test"
+            cat_test.save()
+            domain = Domain.objects.get(pk=1)
+            item_bank = ItemBank()
+            item_bank.name = "Fractions"
+            item_bank.topic = "Addition"
+            item_bank.domain = domain
+            item_bank.template = ItemBankTemplate.objects.get(pk=1)
+            item_bank.question_type = QuestionType.objects.get(pk=1)
+            item_bank.save()
+            user_item_bank = UserItemBank()
+            user_item_bank.user = user
+            user_item_bank.item_bank = item_bank
+            user_item_bank.save()
+            user_cat_test = UserCatTest()
+            user_cat_test.user = user
+            user_cat_test.item_bank = item_bank
+            user_cat_test.cat_test = cat_test
+            user_cat_test.save()
+            response = self.client.get('/end/')
+            self.assertIn('Ability: 0',response.content)
+            self.assertIn('Standard Error: 2',response.content)
+            user_item_bank = UserItemBank.objects.get(pk=1)
+            self.assertEqual(user_item_bank.tests,1)
