@@ -16,6 +16,8 @@ Welcome!
 <th>Ability</th>
 {% for cat_test in cat_tests %}  
   <td>Test</td>
+{% empty %}
+    
 {% endfor %}
 
 {% for bank in user_banks %}
@@ -26,14 +28,16 @@ Welcome!
   <td>{{bank.item_bank.topic}}</td>
   <td>{{bank.questions}}</td>
   <td>{{bank.time_taken}}</td>
-  <td>{{bank.ability}}</td>
+  <td>{{bank.ability|floatformat:3}}</td>
   
 {% for cat_test in cat_tests %}  
   <td><A href="/start/?item_bank_id={{bank.item_bank.id}}&cat_test_id={{cat_test.id}}">{{cat_test.name}}</A></td>
+{% empty %}  
 {% endfor %}
   
 </tr>
-
+{% empty %}
+Sorry, no item banks assigned to this user
 {% endfor %}
 </table>
 

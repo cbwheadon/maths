@@ -2,10 +2,23 @@
 
 {% block content %}
 
-{{user_cat_test.item_bank.name}}<BR>
-{{user_cat_test.item_bank.domain.name}}<BR>
+<script>
+$(document).ready(function(){
+   x = 0;
+   window.setInterval(timer, 1000);
+});
+ 
+function timer() {
+  x ++;
+  $('#timer_fm').val(x);   
+}
+</script>
 
-Questions completed: {{user_cat_test.items}}
+{{user_cat_test.item_bank.domain.name}}<BR>
+{{user_cat_test.item_bank.name}}<BR>
+{{user_cat_test.item_bank.topic}}<BR>
+
+Questions completed: {{user_cat_test.items}}<BR>
 
 {% include user_cat_test.item_bank.template.name %}
 	

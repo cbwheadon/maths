@@ -1,6 +1,7 @@
 from functional_tests import FunctionalTest, ROOT
 from selenium.webdriver.common.keys import Keys
-from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, ItemBankFractionQuestion
+from cat_test.models import CatTestItem, UserCatTest
 from centres.models import UserItemBank
 from fractionqs.models import FractionQuestionBank, Oper
 from django.contrib.auth.models import User
@@ -128,24 +129,12 @@ class TestAdmin(FunctionalTest):
       body = self.browser.find_element_by_tag_name('body')
       self.assertIn('The candidate "Johnny Rotten" was added successfully.', body.text)
       
-      #Set up two item banks and associate with user
+      #Set up an item bank and associate with user
       user = User.objects.get(username="JRotten") 
       domain = Domain.objects.get(name="Number")
       item_bank = ItemBank()
       item_bank.name = "Fractions"
       item_bank.topic = "Addition"
-      item_bank.domain = domain
-      item_bank.template = ItemBankTemplate.objects.get(pk=1)
-      item_bank.question_type = QuestionType.objects.get(pk=1)
-      item_bank.save()
-      user_item_bank = UserItemBank()
-      user_item_bank.user = user
-      user_item_bank.item_bank = item_bank
-      user_item_bank.save()
-      
-      item_bank = ItemBank()
-      item_bank.name = "Fractions"
-      item_bank.topic = "Subtraction"
       item_bank.domain = domain
       item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.question_type = QuestionType.objects.get(pk=1)
@@ -228,10 +217,33 @@ class TestAdmin(FunctionalTest):
       links = self.browser.find_elements_by_link_text('Next')
       links[0].click()
       
-      #Question 2
+      #Get last item
+      
+      user_cat_test = UserCatTest.objects.filter(user=user)
+      user_cat_test = user_cat_test.order_by('-id')[0]
+      cat_test_item = CatTestItem.objects.filter(user_cat_test=user_cat_test)
+      cat_test_item = cat_test_item.order_by('-id')[0]
+      ibq = cat_test_item.item_bank_question
+      
+      ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
+      ans = ifq.fraction_bank_question.question.answer
+      
+      #Enters correct answer and hits submit
+      const_field = self.browser.find_element_by_name('const')
+      const_field.send_keys(ans.const)
+
+      num_field = self.browser.find_element_by_name('num')
+      num_field.send_keys(ans.num)
+
       denom_field = self.browser.find_element_by_name('denom')
+      denom_field.send_keys(ans.denom)
+
       denom_field.send_keys(Keys.RETURN)
       
+      #Should see correct
+      body = self.browser.find_element_by_tag_name('body')
+      self.assertIn('Correct!', body.text)
+            
       #Clicks next
       links = self.browser.find_elements_by_link_text('Next')
       links[0].click()
@@ -255,7 +267,15 @@ class TestAdmin(FunctionalTest):
       #Should see end
       body = self.browser.find_element_by_tag_name('body')
       self.assertIn('End', body.text)
-	  
+      
       #Clicks end
       links = self.browser.find_elements_by_link_text('Return')
       links[0].click()
+      
+      #Should see performance on item bank updated
+      body = self.browser.find_element_by_tag_name('body')
+      self.assertIn('-1.099', body.text)
+      self.assertIn('4', body.text)
+      
+      #Check timer has incremented
+      self.assertNotIn('0', body.text)
