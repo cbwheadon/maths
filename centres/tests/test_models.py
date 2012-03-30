@@ -85,9 +85,11 @@ class TestUserItemBank(TestCase):
         user_item_bank = UserItemBank()
         user_item_bank.user = user
         user_item_bank.item_bank = item_bank
+        user_item_bank.time_taken_str = '01:01:01'
         user_item_bank.save()
         uibs = UserItemBank.objects.all()[0]
         self.assertEqual(uibs.item_bank,item_bank)
+        self.assertEqual(uibs.time_taken_str,'01:01:01')
         self.assertEqual(uibs.user,user)         
         item_banks = ItemBank.objects.filter(useritembank__user=user)
         self.assertEqual(len(item_banks),1)
@@ -125,3 +127,4 @@ class TestUserItemBank(TestCase):
         self.assertEquals(user_item_bank.questions,6)
         self.assertEquals(user_item_bank.correct,4)
         self.assertEquals(user_item_bank.time_taken,240)
+        self.assertEquals(user_item_bank.time_taken_str,'0:04:00')

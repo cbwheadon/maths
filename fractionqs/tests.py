@@ -46,6 +46,8 @@ class TestCreateFraction(TestCase):
       self.assertEquals(fq.const,1)      
       self.assertEquals(fq.num,2)      
       self.assertEquals(fq.denom,3)
+      desc = fq.describe()
+      self.assertEquals(desc,'1 2/3')
 
     def test_two_fractions_equal(self):
       fq1 = FractionWithConstant()
@@ -162,6 +164,9 @@ class TestFractionBank(TestCase):
       oper = Oper.objects.get(pk=1)     
       q = fb.generate_question(oper)
       self.assertEquals(isinstance(q, FractionQuestion),True)
+      #test denominator
+      self.assertNotEqual(q.answer.denom, q.f1.denom * q.f2.denom)
+      self.assertNotEqual(q.f1.denom, q.f2.denom)	  
       
 class TestFractionBankFraction(TestCase):
     def test_creation(self):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from item_banks.models import ItemBank
+import datetime
 
 # Create your models here.
 class Centre(models.Model):
@@ -27,7 +28,8 @@ class UserItemBank(models.Model):
   questions = models.IntegerField(default=0)
   correct = models.IntegerField(default=0)
   time_taken = models.IntegerField(default=0)
-  ability = models.FloatField(default=0)
+  time_taken_str = models.CharField(max_length=8,default='00:00:00')  
+  ability = models.FloatField(default=-10)
   ability_stand_err = models.FloatField(default=2)
   grade = models.IntegerField(default=0)    
   
@@ -38,5 +40,6 @@ class UserItemBank(models.Model):
     self.time_taken += user_cat_test.time_taken
     self.ability = user_cat_test.ability
     self.ability_stand_err = user_cat_test.stand_err
+    self.time_taken_str = str(datetime.timedelta(seconds=self.time_taken))
     self.save()
     return(self)  

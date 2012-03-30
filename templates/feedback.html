@@ -34,9 +34,9 @@ The answer was:
  
 {% endif %} 
  
-{% if user_cat_test.ability != 0 %}
+{% if user_cat_test.ability != -10 %}
 
-Ability: {{ user_cat_test.ability }}
+Ability: {{ user_cat_test.ability|floatformat:3 }}
 
 {% else %}
 

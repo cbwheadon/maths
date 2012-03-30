@@ -52,6 +52,7 @@ class TestItemBankQuestion(TestCase):
       item_bank.template = ItemBankTemplate.objects.get(pk=1)
       item_bank.save()
       ibq = ItemBankQuestion()
+      ibq.name = "test item"      
       ibq.item_bank = item_bank
       ibq.usage = 0
       ibq.difficulty = 0
@@ -64,6 +65,7 @@ class TestItemBankQuestion(TestCase):
       self.assertEquals(ibq.difficulty,0)
       self.assertEquals(ibq.sd_difficulty,0)
       self.assertEquals(ibq.discrimination,1)
+      self.assertEquals(ibq.name,"test item")
       
 class TestItemBankFractionQuestion(TestCase):
     def test_can_create_link_btwn_item_bank_and_fraction_bank(self):
@@ -131,3 +133,6 @@ class TestItemBankFractionQuestion(TestCase):
       item_bank.fill(fqb,"fractions")
       ibqs = ItemBankQuestion.objects.filter(item_bank=item_bank)
       self.assertEquals(len(ibqs),len(fbqs))
+      ibq = ibqs[0]
+      nme = fbqs[0].question.f1.describe() + fbqs[0].question.f2.describe() + fbqs[0].question.answer.describe() 
+      self.assertEquals(ibq.name,nme)

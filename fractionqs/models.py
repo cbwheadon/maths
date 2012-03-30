@@ -36,7 +36,15 @@ class FractionWithConstant(models.Model):
             return u'%s <sup>%s</sup>&frasl;<sub>%s</sub>' % (self.const, self.num, self.denom)
           else:
             return u'<sup>%s</sup>&frasl;<sub>%s</sub>' % (self.num, self.denom)
-
+    def describe(self):
+        if self.num == 0 and self.const != 0:
+          return u'%s' % (self.const)         
+        else:
+          if self.const != 0:    
+            return u'%s %s/%s' % (self.const, self.num, self.denom)
+          else:
+            return u'%s/%s' % (self.num, self.denom)
+    
     def simplest_form(self):
         #take sign from constant
         if self.const < 0:
@@ -90,8 +98,8 @@ class FractionWithConstantForm(ModelForm):
     fields = ('const', 'num' , 'denom')
     widgets = {
             'const': TextInput(attrs={'size': 3, 'maxlength': 3}),
-			'num': TextInput(attrs={'size': 3, 'maxlength': 3}),
-			'denom': TextInput(attrs={'size': 3, 'maxlength': 3}),
+            'num': TextInput(attrs={'size': 3, 'maxlength': 3}),
+            'denom': TextInput(attrs={'size': 3, 'maxlength': 3}),
         }   
         
 class Oper(models.Model):
@@ -119,10 +127,19 @@ class FractionBank(models.Model):
     def generate_question(self,oper):
       fbfs = FractionBankFraction.objects.filter(fraction_bank=self)
       #Choose two random fractions
-      fs = random.sample(fbfs, 2) 
-      #Return question
-      fq = FractionQuestion()
-      ans = fs[0].fraction.oper(fs[1].fraction,oper)
+      reject = True
+      while reject:
+        fs = random.sample(fbfs, 2) 
+        #Return question
+        fq = FractionQuestion()
+        ans = fs[0].fraction.oper(fs[1].fraction,oper)
+        #Test requires simplification
+        if fs[0].fraction.denom  != ans.denom:
+          if fs[1].fraction.denom  != ans.denom:
+            if fs[0].fraction.denom  != fs[1].fraction.denom:
+              if ans.denom != fs[0].fraction.denom * fs[1].fraction.denom:
+                reject = False
+        
       #See if answer in database
       fwcs = FractionWithConstant.objects.all()
       mtch = False

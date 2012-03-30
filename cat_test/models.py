@@ -14,7 +14,7 @@ class UserCatTest(models.Model):
     user = models.ForeignKey(User)
     item_bank = models.ForeignKey(ItemBank)
     cat_test = models.ForeignKey(CatTest)
-    ability = models.FloatField(default=0)
+    ability = models.FloatField(default=-10)
     difficulty = models.FloatField(default=0)    
     stand_err = models.FloatField(default=2)
     items = models.IntegerField(default=0)
@@ -43,7 +43,7 @@ class UserCatTest(models.Model):
       #2. Find next item near difficulty, D.
       start_range = self.difficulty - self.stand_err
       end_range = self.difficulty + self.stand_err
-      qrange = ItemBankQuestion.objects.filter(difficulty__range=(start_range,end_range))
+      qrange = ItemBankQuestion.objects.filter(difficulty__range=(start_range,end_range),item_bank=self.item_bank)
       qrange = qrange.exclude(cattestitem__user_cat_test=self)
       if len(qrange) == 0:
         #If none in ideal range choose any
@@ -90,6 +90,10 @@ class UserCatTest(models.Model):
       if wrong > 0 and self.right > 0:
         self.ability = float(self.hardness)/self.items + math.log(float(self.right)/wrong)
 #15. Estimate standard error of the measure: S = L/(R*W)
+      if self.right > 1 and wrong == 0:
+        self.ability = 5
+      if wrong > 1 and self.right == 0:
+        self.ability = -5        
       if wrong > 0 and self.right > 0: 
         self.stand_err = float(self.items) / (self.right*wrong)
 #16. Compare B with pass/fail standard T.

@@ -276,6 +276,3 @@ class TestAdmin(FunctionalTest):
       body = self.browser.find_element_by_tag_name('body')
       self.assertIn('-1.099', body.text)
       self.assertIn('4', body.text)
-      
-      #Check timer has incremented
-      self.assertNotIn('0', body.text)

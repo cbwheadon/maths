@@ -280,8 +280,6 @@ class TestCatFeedbackView(TestCase):
             self.assertIn(str(answer.denom),response.content)
             #Should show user's time
             self.assertIn('12',response.content)
-            #Should say in a row
-            self.assertIn('0 in a row!',response.content)
             #Should say ability
             self.assertIn('No ability estimate',response.content)
 

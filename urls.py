@@ -9,7 +9,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'maths.views.home', name='home'),
+    url(r'^$', welcome, name='home'),
     # url(r'^maths/', include('maths.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

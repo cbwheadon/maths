@@ -1,0 +1,9 @@
+Pomodoros
+
+30/03
+test that question appears in admin,1 
+add question to admin,1
+test that you can see question, 2
+add question view to admin, 2
+test that you can delete question, 3
+add delete functionality to admin, 3

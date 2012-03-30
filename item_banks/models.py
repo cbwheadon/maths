@@ -37,6 +37,7 @@ class ItemBank(models.Model):
         ibq.difficulty = 0
         ibq.sd_difficulty = 0
         ibq.discrimination = 1
+        ibq.name = fbq.question.f1.describe() + " " + str(fbq.question.oper) + " " + fbq.question.f2.describe() + " = " + fbq.question.answer.describe()
         ibq.save()
         ibfb = ItemBankFractionQuestion()
         ibfb.item_bank_question = ibq
@@ -44,11 +45,15 @@ class ItemBank(models.Model):
         ibfb.save()
     
 class ItemBankQuestion(models.Model):
+  name = models.CharField(max_length=255)
   item_bank = models.ForeignKey(ItemBank)
   usage = models.IntegerField(default=0)
   difficulty = models.IntegerField(default=0)
   sd_difficulty = models.IntegerField(default=0)
   discrimination = models.IntegerField(default=1)
+  
+  def __unicode__(self):
+    return self.name   
   
 class ItemBankFractionQuestion(models.Model):
   item_bank_question = models.ForeignKey(ItemBankQuestion)
