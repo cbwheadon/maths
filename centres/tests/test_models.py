@@ -1,6 +1,6 @@
 from django.test import TestCase
-from centres.models import Centre, Candidate, UserItemBank
-from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
+from centres.models import Centre, Candidate, UserItemBank, UserItemBankProbabilities
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, Grade, Threshold
 from cat_test.models import CatTest, UserCatTest
 import datetime
 from django.contrib.auth.models import User
@@ -92,7 +92,7 @@ class TestUserItemBank(TestCase):
         self.assertEqual(uibs.time_taken_str,'01:01:01')
         self.assertEqual(uibs.user,user)         
         item_banks = ItemBank.objects.filter(useritembank__user=user)
-        self.assertEqual(len(item_banks),1)
+        self.assertEqual(len(item_banks),1)        
         
     def test_user_item_bank_update(self):
         user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
@@ -128,3 +128,63 @@ class TestUserItemBank(TestCase):
         self.assertEquals(user_item_bank.correct,4)
         self.assertEquals(user_item_bank.time_taken,240)
         self.assertEquals(user_item_bank.time_taken_str,'0:04:00')
+
+    def test_user_item_bank_probabilities(self):
+        user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+        user.save()
+        domain = Domain.objects.get(pk=1)
+        item_bank = ItemBank()
+        item_bank.name = "Fractions"
+        item_bank.topic = "Addition"
+        item_bank.domain = domain
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
+        item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.save()
+        user_item_bank = UserItemBank()
+        user_item_bank.user = user
+        user_item_bank.item_bank = item_bank
+        user_item_bank.save()
+        grd = Grade.objects.get(name="A")
+        thresh = Threshold()
+        thresh.grade = grd
+        thresh.item_bank = item_bank
+        thresh.ability = -1      
+        thresh.save()
+        user_item_bank.probabilities()
+        probs = UserItemBankProbabilities.objects.all()    
+        self.assertEquals(len(probs),1)
+        #Get threshold probabilities
+        user_item_banks = UserItemBank.objects.filter(user=user)    
+        for user_item_bank in user_item_banks:
+          threshes = user_item_bank.useritembankprobabilities_set.all()
+          self.assertEquals(len(threshes),1)
+          
+class TestUserItemBankProbabilities(TestCase):        
+    def test_create_and_save(self):
+        user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+        user.save()
+        domain = Domain.objects.get(name="Number")
+        item_bank = ItemBank()
+        item_bank.name = "Fractions"
+        item_bank.topic = "Addition"
+        item_bank.domain = domain
+        item_bank.question_type = QuestionType.objects.get(pk=1)
+        item_bank.template = ItemBankTemplate.objects.get(pk=1)
+        item_bank.save()
+        user_item_bank = UserItemBank()
+        user_item_bank.user = user
+        user_item_bank.item_bank = item_bank
+        user_item_bank.save()
+        grd = Grade.objects.get(name="A")
+        thresh = Threshold()
+        thresh.grade = grd
+        thresh.item_bank = item_bank
+        thresh.ability = -1      
+        thresh.save()
+        probs = UserItemBankProbabilities()     
+        probs.user_item_bank = user_item_bank
+        probs.threshold = thresh
+        probs.probability = 50
+        probs.save()
+        probs = UserItemBankProbabilities.objects.all()[0]
+        self.assertEquals(probs.probability,50)       

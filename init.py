@@ -1,6 +1,6 @@
-from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, ItemBankFractionQuestion
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, ItemBankFractionQuestion, Threshold, Grade
 from cat_test.models import CatTestItem, UserCatTest
-from centres.models import UserItemBank
+from centres.models import UserItemBank, UserItemBankProbabilities
 from django.contrib.auth.models import User
 from fractionqs.models import FractionQuestionBank, Oper
 
@@ -8,6 +8,8 @@ from fractionqs.models import FractionQuestionBank, Oper
 ItemBank.objects.all().delete()
 UserItemBank.objects.all().delete()
 FractionQuestionBank.objects.all().delete()
+Threshold.objects.all().delete()
+UserItemBankProbabilities.objects.all().delete()
 
 #Set up an item bank and associate with user
 user = User.objects.get(username="user") 
@@ -23,6 +25,21 @@ user_item_bank = UserItemBank()
 user_item_bank.user = user
 user_item_bank.item_bank = item_bank
 user_item_bank.save()
+
+#Set thresholds
+grd = Grade.objects.get(name="A")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = 1      
+thresh.save()
+grd = Grade.objects.get(name="C")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = -1      
+thresh.save()
+user_item_bank.probabilities()
 
 #Give the test some questions
 #Create fraction question bank
@@ -49,6 +66,21 @@ user_item_bank.user = user
 user_item_bank.item_bank = item_bank
 user_item_bank.save()
 
+#Set thresholds
+grd = Grade.objects.get(name="A")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = 1      
+thresh.save()
+grd = Grade.objects.get(name="C")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = -1      
+thresh.save()
+user_item_bank.probabilities()
+
 #Create fraction question bank
 fqb = FractionQuestionBank()
 oper = Oper.objects.get(pk=2)
@@ -74,6 +106,21 @@ user_item_bank.user = user
 user_item_bank.item_bank = item_bank
 user_item_bank.save()
 
+#Set thresholds
+grd = Grade.objects.get(name="A")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = 1      
+thresh.save()
+grd = Grade.objects.get(name="C")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = -1      
+thresh.save()
+user_item_bank.probabilities()
+
 #Create fraction question bank
 fqb = FractionQuestionBank()
 oper = Oper.objects.get(pk=3)
@@ -98,6 +145,21 @@ user_item_bank = UserItemBank()
 user_item_bank.user = user
 user_item_bank.item_bank = item_bank
 user_item_bank.save()
+
+#Set thresholds
+grd = Grade.objects.get(name="A")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = 1      
+thresh.save()
+grd = Grade.objects.get(name="C")
+thresh = Threshold()
+thresh.grade = grd
+thresh.item_bank = item_bank
+thresh.ability = -1      
+thresh.save()
+user_item_bank.probabilities()
 
 #Create fraction question bank
 fqb = FractionQuestionBank()

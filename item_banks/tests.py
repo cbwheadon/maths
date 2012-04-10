@@ -1,11 +1,42 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion, QuestionType, ItemBankTemplate
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, ItemBankFractionQuestion, QuestionType, ItemBankTemplate, Grade, Threshold
 from fractionqs.models import FractionQuestionBank, Oper, FractionBankQuestion
 import datetime
 from django.contrib.auth.models import User
 from django.test.client import Client
 from functional_tests import ROOT
+
+class TestGrades(TestCase):
+    def test_create_and_save(self):
+      gr = Grade()
+      gr.name = "FF"
+      gr.save()
+      gr = Grade.objects.filter(name="FF")
+      self.assertEquals(len(gr),1)
+
+class TestThresholds(TestCase):
+    def test_create_and_save(self):
+      grd = Grade.objects.get(name="A")
+      domain = Domain.objects.get(name="Number")
+      item_bank = ItemBank()
+      item_bank.name = "Fractions"
+      item_bank.topic = "Addition"
+      item_bank.domain = domain
+      item_bank.template = ItemBankTemplate.objects.get(pk=1)
+      item_bank.question_type = QuestionType.objects.get(pk=1)
+      item_bank.save()
+      thresh = Threshold()
+      thresh.grade = grd
+      thresh.item_bank = item_bank
+      thresh.ability = -1
+      thresh.init_prob = 50	  
+      thresh.save()
+      thresh = Threshold.objects.all()[0]
+      self.assertEquals(thresh.ability,-1)
+      self.assertEquals(thresh.grade.name,"A")
+      self.assertEquals(thresh.item_bank.name,"Fractions")
+      self.assertEquals(thresh.init_prob,50)  	  
 
 class TestItemBankTemplate(TestCase):
     def test_create_and_save(self):
@@ -134,5 +165,5 @@ class TestItemBankFractionQuestion(TestCase):
       ibqs = ItemBankQuestion.objects.filter(item_bank=item_bank)
       self.assertEquals(len(ibqs),len(fbqs))
       ibq = ibqs[0]
-      nme = fbqs[0].question.f1.describe() + fbqs[0].question.f2.describe() + fbqs[0].question.answer.describe() 
+      nme = fbqs[0].question.f1.describe() + " + " + fbqs[0].question.f2.describe() + " = " + fbqs[0].question.answer.describe() 
       self.assertEquals(ibq.name,nme)

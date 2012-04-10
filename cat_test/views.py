@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from cat_test.models import CatTest, UserCatTest, CatTestItem, CatTestItemFractionAnswer
 from item_banks.models import ItemBank, ItemBankFractionQuestion
 from fractionqs.models import FractionWithConstantForm, FractionWithConstant 
-from centres.models import UserItemBank
+from centres.models import UserItemBank, UserItemBankProbabilities
 
 def start_test(request):
   #check for log in
@@ -18,11 +18,14 @@ def start_test(request):
     #Retrieve item bank
     item_bank = ItemBank.objects.get(pk=item_bank_id)
     cat_test = CatTest.objects.get(pk=cat_test_id)
+    uib = UserItemBank.objects.get(user=user,item_bank=item_bank)	
     #New user_cat_test
     user_cat_test = UserCatTest()
     user_cat_test.user = user
     user_cat_test.item_bank = item_bank
     user_cat_test.cat_test = cat_test
+    user_cat_test.ability = uib.ability
+    user_cat_test.stand_dev = uib.ability_stand_dev	
     user_cat_test.save()
     
   #Create cat_test for user with info from item bank
@@ -89,11 +92,11 @@ def question(request):
     if 'time' in request.POST and request.POST['time']:       
       time_taken = request.POST['time']
     else:
-      time_taken = 0    
-    user_cat_test.updateAbility(correct,time_taken)
+      time_taken = 0       
     cat_test_item.time_taken = time_taken
     cat_test_item.correct = correct
     cat_test_item.save()
+    user_cat_test.simAbility()	
     return HttpResponseRedirect('/feedback/')
     
 def feedback(request):
@@ -112,11 +115,13 @@ def feedback(request):
     ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
     answer = ifq.fraction_bank_question.question.answer
   end_test = user_cat_test.endTest()
+  user_item_bank = UserItemBank.objects.filter(user=user,item_bank=user_cat_test.item_bank)
+  probs = UserItemBankProbabilities.objects.filter(user_item_bank=user_item_bank)  
   if end_test:
     end_now = 1
   else:
     end_now = 0	
-  return render_to_response('feedback.html',{'cat_test_item':cat_test_item,'answer':answer,'response':response,'user_cat_test':user_cat_test,'end_test':end_now})
+  return render_to_response('feedback.html',{'cat_test_item':cat_test_item,'answer':answer,'response':response,'user_cat_test':user_cat_test,'end_test':end_now,'probs':probs})
   
 def end_test(request):
   if not request.user.is_authenticated():

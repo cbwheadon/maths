@@ -34,15 +34,12 @@ The answer was:
  
 {% endif %} 
  
-{% if user_cat_test.ability != -10 %}
+Ability: {{ user_cat_test.ability|floatformat:3 }}<BR>
 
-Ability: {{ user_cat_test.ability|floatformat:3 }}
-
-{% else %}
-
-No ability estimate available yet...<BR>
-
-{% endif %}
+Probabilities<BR>
+{% for prob in probs %}
+{{prob.threshold.grade.name}} : {{prob.probability|floatformat:0}}%<BR>
+{% endfor %}
 
 {% if end_test == 1 %}
   <A href="/end/">End</A>

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from functional_tests import ROOT
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType, ItemBankFractionQuestion, ItemBankTemplate
+from item_banks.models import ItemBank, Domain, ItemBankQuestion, QuestionType, ItemBankFractionQuestion, ItemBankTemplate, Grade, Threshold
 from centres.models import UserItemBank
 from cat_test.models import CatTest, UserCatTest, CatTestItem
 from fractionqs.models import FractionQuestionBank, Oper
@@ -142,11 +142,8 @@ class TestCatQuestionView(TestCase):
           response = self.client.post('/question/', {'const': answer.const, 'num': answer.num, 'denom': answer.denom, 'time': 12})
           user_cat_test = UserCatTest.objects.get(user=user)
           self.assertEqual(user_cat_test.items,1)
-          self.assertEqual(user_cat_test.ability,0)
-          self.assertEqual(user_cat_test.difficulty,2)
-          self.assertEqual(user_cat_test.hardness,0)
-          self.assertEqual(user_cat_test.right,1)
-          self.assertEqual(user_cat_test.time_taken,12)
+          self.assertEqual(round(user_cat_test.ability,2),0.28)
+          self.assertEqual(round(user_cat_test.stand_dev,2),0.91)
           #Check that a response has now been saved to user_cat_test
           cti = CatTestItem.objects.filter(user_cat_test=user_cat_test)
           self.assertEqual(len(cti),1)
@@ -163,11 +160,8 @@ class TestCatQuestionView(TestCase):
           response = self.client.post('/question/', {'const': answer.const, 'num': answer.num, 'denom': answer.denom, 'time': 22})
           user_cat_test = UserCatTest.objects.get(user=user)
           self.assertEqual(user_cat_test.items,2)
-          self.assertEqual(user_cat_test.ability,0)
-          self.assertEqual(user_cat_test.difficulty,1)
-          self.assertEqual(user_cat_test.hardness,0)
-          self.assertEqual(user_cat_test.right,2)
-          self.assertEqual(user_cat_test.time_taken,34)
+          self.assertEqual(round(user_cat_test.ability,2),0.75)
+          self.assertEqual(round(user_cat_test.stand_dev,2),0.82)          
           #Check that a response has now been saved to user_cat_test
           cti = CatTestItem.objects.filter(user_cat_test=user_cat_test)
           cti = cti.order_by('-id')
@@ -181,20 +175,15 @@ class TestCatQuestionView(TestCase):
           response = self.client.post('/question/', {'const': answer.const, 'num': answer.num, 'denom': answer.denom, 'time': 3})
           user_cat_test = UserCatTest.objects.get(user=user)
           self.assertEqual(user_cat_test.items,3)
-          self.assertEqual(user_cat_test.ability,math.log(2))
-          self.assertEqual(user_cat_test.difficulty,- 2.0/3.0)
-          self.assertEqual(user_cat_test.hardness,0)
-          self.assertEqual(user_cat_test.right,2)
-          self.assertEqual(user_cat_test.time_taken,37)
+          self.assertEqual(round(user_cat_test.ability,2),0.76)
+          self.assertEqual(round(user_cat_test.stand_dev,2),0.71)          
           #Check that a response has now been saved to user_cat_test
           cti = CatTestItem.objects.filter(user_cat_test=user_cat_test)
           cti = cti.order_by('-id')
           self.assertEqual(len(cti),3)
           #Check response has been saved to cti
           self.assertEqual(cti[0].correct,0)
-          self.assertEqual(cti[0].time_taken,3)
-          
-          
+          self.assertEqual(cti[0].time_taken,3)                   
           
         def test_question_view_wout_login(self):
           response = self.client.get('/question/')
@@ -235,11 +224,21 @@ class TestCatFeedbackView(TestCase):
             user_item_bank.user = user
             user_item_bank.item_bank = item_bank
             user_item_bank.save()
+            #Create a threshold
+            grd = Grade.objects.get(name="A")
+            thresh = Threshold()
+            thresh.grade = grd
+            thresh.item_bank = item_bank
+            thresh.ability = -1      
+            thresh.save()
+            
+            user_item_bank.probabilities()
             user_cat_test = UserCatTest()
             user_cat_test.user = user
             user_cat_test.item_bank = item_bank
             user_cat_test.cat_test = cat_test
             user_cat_test.save()
+            
             #Give the test some questions
             #Create fraction question bank
             fqb = FractionQuestionBank()
@@ -280,8 +279,8 @@ class TestCatFeedbackView(TestCase):
             self.assertIn(str(answer.denom),response.content)
             #Should show user's time
             self.assertIn('12',response.content)
-            #Should say ability
-            self.assertIn('No ability estimate',response.content)
+            #Should show probabilities
+            self.assertIn('%',response.content)            
 
 class TestCatEnd(TestCase):
           def test_end_wout_login(self):
@@ -325,6 +324,5 @@ class TestCatEnd(TestCase):
             user_cat_test.save()
             response = self.client.get('/end/')
             self.assertIn('Ability: 0',response.content)
-            self.assertIn('Standard Error: 2',response.content)
             user_item_bank = UserItemBank.objects.get(pk=1)
             self.assertEqual(user_item_bank.tests,1)

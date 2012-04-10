@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from item_banks.models import ItemBank
+from item_banks.models import ItemBank, Threshold
 import datetime
 
 # Create your models here.
@@ -29,8 +29,8 @@ class UserItemBank(models.Model):
   correct = models.IntegerField(default=0)
   time_taken = models.IntegerField(default=0)
   time_taken_str = models.CharField(max_length=8,default='00:00:00')  
-  ability = models.FloatField(default=-10)
-  ability_stand_err = models.FloatField(default=2)
+  ability = models.FloatField(default=0)
+  ability_stand_dev = models.FloatField(default=1)
   grade = models.IntegerField(default=0)    
   
   def update(self,user_cat_test):
@@ -39,7 +39,26 @@ class UserItemBank(models.Model):
     self.correct += user_cat_test.right
     self.time_taken += user_cat_test.time_taken
     self.ability = user_cat_test.ability
-    self.ability_stand_err = user_cat_test.stand_err
+    self.ability_stand_dev = user_cat_test.stand_dev     
+    user_cat_test.updateTime()
+    self.time_taken += user_cat_test.time_taken
     self.time_taken_str = str(datetime.timedelta(seconds=self.time_taken))
     self.save()
-    return(self)  
+    return(self)
+    
+  def probabilities(self):
+    #Return grade thresholds  
+    threshes = Threshold.objects.filter(item_bank=self.item_bank)
+    #For each threshold initialise UserItemBankProbabilities
+    for thresh in threshes:
+      prob = UserItemBankProbabilities()
+      prob.user_item_bank = self
+      prob.threshold = thresh
+      prob.probability = thresh.init_prob
+      prob.save()      
+    return(self)    
+
+class UserItemBankProbabilities(models.Model):
+    user_item_bank = models.ForeignKey(UserItemBank)
+    threshold = models.ForeignKey(Threshold)
+    probability = models.FloatField()      

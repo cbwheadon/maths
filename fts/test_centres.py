@@ -1,6 +1,6 @@
 from functional_tests import FunctionalTest, ROOT
 from selenium.webdriver.common.keys import Keys
-from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, ItemBankFractionQuestion
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, ItemBankFractionQuestion, Grade, Threshold
 from cat_test.models import CatTestItem, UserCatTest
 from centres.models import UserItemBank
 from fractionqs.models import FractionQuestionBank, Oper
@@ -144,6 +144,17 @@ class TestAdmin(FunctionalTest):
       user_item_bank.item_bank = item_bank
       user_item_bank.save()
       
+      #Set up thresholds
+      #add threshold
+      grd = Grade.objects.get(name="C")
+      thresh = Threshold()
+      thresh.grade = grd
+      thresh.item_bank = item_bank
+      thresh.ability = 0      
+      thresh.save()
+      #add user probabilities
+      user_item_bank.probabilities()   
+      
       #Give the test some questions
       #Create fraction question bank
       fqb = FractionQuestionBank()
@@ -174,6 +185,7 @@ class TestAdmin(FunctionalTest):
       self.assertIn('Number',  body.text)
       self.assertIn('Fractions',  body.text)
       self.assertIn('Addition',  body.text)
+      self.assertIn('50%',  body.text)
       
       #Candidate clicks on link to start test
       links = self.browser.find_elements_by_link_text('Short Test')
@@ -217,7 +229,7 @@ class TestAdmin(FunctionalTest):
       links = self.browser.find_elements_by_link_text('Next')
       links[0].click()
       
-      #Get last item
+      #Get second item
       
       user_cat_test = UserCatTest.objects.filter(user=user)
       user_cat_test = user_cat_test.order_by('-id')[0]
@@ -252,7 +264,7 @@ class TestAdmin(FunctionalTest):
       denom_field = self.browser.find_element_by_name('denom')
       denom_field.send_keys(Keys.RETURN)
       
-      #Clicks next
+      #Doesn't answer, clicks next
       links = self.browser.find_elements_by_link_text('Next')
       links[0].click()
       
@@ -260,7 +272,7 @@ class TestAdmin(FunctionalTest):
       denom_field = self.browser.find_element_by_name('denom')
       denom_field.send_keys(Keys.RETURN)
       
-      #Clicks next
+      #Doesn't answer, clicks next
       links = self.browser.find_elements_by_link_text('End')
       links[0].click()
       
@@ -274,5 +286,6 @@ class TestAdmin(FunctionalTest):
       
       #Should see performance on item bank updated
       body = self.browser.find_element_by_tag_name('body')
-      self.assertIn('-1.099', body.text)
+      self.assertIn('-2.318', body.text)
       self.assertIn('4', body.text)
+      self.assertIn('2%', body.text)

@@ -14,6 +14,12 @@ Welcome!
 <th>Questions Answered</th>
 <th>Time Spent</th>
 <th>Ability</th>
+{% for bank in user_banks %}
+	{% for thresh in bank.useritembankprobabilities_set.all %}
+		<th>{{thresh.threshold.grade.name}}<th>
+	{% endfor %}
+{% endfor %}
+
 {% for cat_test in cat_tests %}  
   <th>Test</th>
 {% empty %}
@@ -28,11 +34,11 @@ Welcome!
   <td>{{bank.item_bank.topic}}</td>
   <td>{{bank.questions}}</td>
   <td>{{bank.time_taken_str}}</td>
-  <td>
-  {% if bank.ability != -10 %}
-  {{bank.ability|floatformat:3}}
-  {% endif %}
-  </td>
+  <td>{{bank.ability|floatformat:3}}</td>
+  
+{% for thresh in bank.useritembankprobabilities_set.all %}
+  <td>{{thresh.probability|floatformat:0}}%<td>
+{% endfor %}
   
 {% for cat_test in cat_tests %}  
   <td><A href="/start/?item_bank_id={{bank.item_bank.id}}&cat_test_id={{cat_test.id}}">{{cat_test.name}}</A></td>

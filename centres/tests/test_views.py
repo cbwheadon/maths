@@ -1,6 +1,6 @@
 from django.test import TestCase
 from centres.models import Centre, Candidate, UserItemBank
-from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate
+from item_banks.models import ItemBank, Domain, QuestionType, ItemBankTemplate, Grade, Threshold
 from cat_test.models import CatTest
 import datetime
 from django.contrib.auth.models import User
@@ -33,6 +33,16 @@ class TestUserItemBanksView(TestCase):
           user_item_bank.item_bank = item_bank
           user_item_bank.save()
           
+          #add threshold
+          grd = Grade.objects.get(name="C")
+          thresh = Threshold()
+          thresh.grade = grd
+          thresh.item_bank = item_bank
+          thresh.ability = 0      
+          thresh.save()
+          #add user probabilities
+          user_item_bank.probabilities() 
+          
           item_bank = ItemBank()
           item_bank.name = "Fractions"
           item_bank.topic = "Subtraction"
@@ -44,6 +54,15 @@ class TestUserItemBanksView(TestCase):
           user_item_bank.user = user
           user_item_bank.item_bank = item_bank
           user_item_bank.save()
+          #add threshold
+          grd = Grade.objects.get(name="C")
+          thresh = Threshold()
+          thresh.grade = grd
+          thresh.item_bank = item_bank
+          thresh.ability = 0      
+          thresh.save()
+          #add user probabilities
+          user_item_bank.probabilities()                    
           
           #log in
           response = self.client.post(ROOT + '/accounts/login/', {'username': 'john', 'password': 'johnpassword'})
@@ -52,6 +71,10 @@ class TestUserItemBanksView(TestCase):
           self.assertIn('Domain', response.content)
           self.assertIn('Fractions', response.content)
           self.assertIn('Addition', response.content)
+          
+          #Test threshold probababities are there          
+          self.assertIn('C', response.content)
+          self.assertIn('50%', response.content)
           #Test user banks are there
           self.assertEqual(len(response.context['user_banks']), 2)  
           #Test there are links to start a test

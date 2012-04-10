@@ -2,6 +2,9 @@ from django.db import models
 from fractionqs.models import FractionBankQuestion
 import datetime
 
+class Grade(models.Model):
+  name = models.CharField(max_length=2)
+  
 class ItemBankTemplate(models.Model):
   name = models.CharField(max_length=20)
 
@@ -58,3 +61,9 @@ class ItemBankQuestion(models.Model):
 class ItemBankFractionQuestion(models.Model):
   item_bank_question = models.ForeignKey(ItemBankQuestion)
   fraction_bank_question = models.ForeignKey(FractionBankQuestion)  
+  
+class Threshold(models.Model):
+  item_bank = models.ForeignKey(ItemBank)
+  grade = models.ForeignKey(Grade)
+  ability = models.FloatField()
+  init_prob = models.FloatField(default=50)

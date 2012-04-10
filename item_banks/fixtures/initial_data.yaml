@@ -11,5 +11,15 @@
 - model: item_banks.itembanktemplate
   pk: 1
   fields:
-    name: 'fractions.html'    
+    name: 'fractions.html'
+
+- model: item_banks.grade
+  pk: 1
+  fields:
+    name: 'A'  
+    
+- model: item_banks.grade
+  pk: 2
+  fields:
+    name: 'C'     
     

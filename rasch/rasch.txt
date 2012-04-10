@@ -1,0 +1,15 @@
+model{
+  for (i in 1:n){
+    for (j in 1:p){
+      Y[i, j] ~ dbern(prob[i, j])
+      logit(prob[i, j]) <- theta[i] - delta[j]
+    }
+    theta[i] ~ dnorm(m.theta, pr.theta)
+  }
+  ## Priors on item parameters
+  for (j in 1:p){
+    delta[j] ~ dnorm(m.delta, pr.delta)
+    }
+  pr.delta <- pow(s.delta, -2)
+  pr.theta <- pow(s.theta, -2)
+}
