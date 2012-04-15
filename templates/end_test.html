@@ -10,6 +10,11 @@ Ability: {{user_cat_test.ability|floatformat:3}}<BR>
 
 Standard Deviation: {{user_cat_test.stand_dev|floatformat:3}}<BR>
 
+Probabilities<BR>
+{% for prob in probs %}
+{{prob.threshold.grade.name}} : {{prob.probability|floatformat:0}}%<BR>
+{% endfor %}
+
 The End
 
 <A href="/welcome/">Return</A>

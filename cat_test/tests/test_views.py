@@ -317,6 +317,15 @@ class TestCatEnd(TestCase):
             user_item_bank.user = user
             user_item_bank.item_bank = item_bank
             user_item_bank.save()
+			#Create a threshold
+            grd = Grade.objects.get(name="A")
+            thresh = Threshold()
+            thresh.grade = grd
+            thresh.item_bank = item_bank
+            thresh.ability = -1
+            thresh.init_prob =50			
+            thresh.save()
+            user_item_bank.probabilities()
             user_cat_test = UserCatTest()
             user_cat_test.user = user
             user_cat_test.item_bank = item_bank
@@ -326,3 +335,5 @@ class TestCatEnd(TestCase):
             self.assertIn('Ability: 0',response.content)
             user_item_bank = UserItemBank.objects.get(pk=1)
             self.assertEqual(user_item_bank.tests,1)
+            #Should show probabilities
+            self.assertIn('50%',response.content)

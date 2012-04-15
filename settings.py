@@ -13,8 +13,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         #'NAME': '/home/ubuntu/work/maths/database.sqlite',                      # Or path to database file if using sqlite3.
-        #'NAME': 'C:/Users/cbwheadon/Documents/Django/maths/database.sqlite',    
-        'NAME': 'C:/Users/User/BitNami DjangoStack projects/maths/database.sqlite',
+        'NAME': 'C:/Users/cbwheadon/Documents/Django/maths/database.sqlite',    
+        #'NAME': 'C:/Users/User/BitNami DjangoStack projects/maths/database.sqlite',
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -59,8 +59,8 @@ MEDIA_URL = ''
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
 # STATIC_ROOT = '/home/ubuntu/work/static'
-#  STATIC_ROOT = 'C:/Users/cbwheadon/Documents/Django/static/'
-STATIC_ROOT = 'C:/Users/User/BitNami DjangoStack projects/static/'
+STATIC_ROOT = 'C:/Users/cbwheadon/Documents/Django/static/'
+# STATIC_ROOT = 'C:/Users/User/BitNami DjangoStack projects/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -111,8 +111,8 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     #"/home/ubuntu/work/maths/templates"
-    #"C:/Users/cbwheadon/Documents/Django/maths/templates"
-	"C:/Users/User/BitNami DjangoStack projects/maths/templates"	
+    "C:/Users/cbwheadon/Documents/Django/maths/templates"
+    #"C:/Users/User/BitNami DjangoStack projects/maths/templates"    
 )
 
 INSTALLED_APPS = (

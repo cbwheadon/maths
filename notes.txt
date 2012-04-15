@@ -4,3 +4,5 @@
 ##selenium
 ##mock
 ##PyYaml
+##request.META["HTTP_REFERER"]
+##request.META.HTTP_REFERER

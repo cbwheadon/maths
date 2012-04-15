@@ -115,7 +115,7 @@ def feedback(request):
     ifq = ItemBankFractionQuestion.objects.get(item_bank_question=ibq)
     answer = ifq.fraction_bank_question.question.answer
   end_test = user_cat_test.endTest()
-  user_item_bank = UserItemBank.objects.filter(user=user,item_bank=user_cat_test.item_bank)
+  user_item_bank = UserItemBank.objects.get(user=user,item_bank=user_cat_test.item_bank)
   probs = UserItemBankProbabilities.objects.filter(user_item_bank=user_item_bank)  
   if end_test:
     end_now = 1
@@ -131,7 +131,9 @@ def end_test(request):
   if len(user_cat_test)>0:
     user_cat_test = user_cat_test.order_by('-id')[0]
     uib = UserItemBank.objects.get(user=user,item_bank=user_cat_test.item_bank)
-    uib.update(user_cat_test)    
-    return render_to_response('end_test.html',{'user_cat_test':user_cat_test})
+    uib.update(user_cat_test)
+    probs = UserItemBankProbabilities.objects.filter(user_item_bank=uib)  
+  
+    return render_to_response('end_test.html',{'user_cat_test':user_cat_test,'probs':probs})
   else:
     return render_to_response('end_test.html',{'error':'No Test Found'})  

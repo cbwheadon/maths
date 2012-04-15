@@ -116,11 +116,12 @@ class UserCatTest(models.Model):
       myR['grades'] = array(thrs)
       myR['m.theta'] = self.ability
       myR['s.theta'] = self.stand_dev
-      myR.run('source("C:/Users/User/BitNami DjangoStack projects/maths/rasch/rasch.R")')
+      #myR.run('source("C:/Users/User/BitNami DjangoStack projects/maths/rasch/rasch.R")')
+      myR.run('source("C:/Users/cbwheadon/Documents/Django/maths/rasch/rasch.R")')
       self.ability = myR['thm']
       self.stand_dev = myR['ths']
       grade_probs = myR['probs']
-      print grade_probs	  
+	  
       #Update grade probabilities
       user_item_bank = UserItemBank.objects.filter(user=self.user,item_bank = self.item_bank)
       i = 0      
